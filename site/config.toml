@@ -1,4 +1,4 @@
-baseurl = "http://blog.hackervaillant.eu"
+baseurl = "https://blog.hackervaillant.eu/"
 title = "gfeun"
 
 theme = "hugo-coder"
