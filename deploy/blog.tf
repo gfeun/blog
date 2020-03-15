@@ -31,8 +31,9 @@ resource "null_resource" "ansible_provisionning" {
   }
 
   provisioner "local-exec" {
-    command = "ansible-playbook --user root --private-key '${var.ssh_private_key_file}' -i '${digitalocean_droplet.blog.ipv4_address},' playbook.yml"
+    command = "ansible-playbook --user root --private-key '${var.ssh_private_key_file}' -i '${digitalocean_droplet.blog.ipv4_address},' -e 'blog_fqdn=${var.blog_fqdn}' playbook.yml"
     environment = {
+      "ANSIBLE_HOST_KEY_CHECKING" = "False"
       "PRIVATE_KEY" = acme_certificate.blog_certificate.private_key_pem
       "CERTIFICATE" = acme_certificate.blog_certificate.certificate_pem
     }

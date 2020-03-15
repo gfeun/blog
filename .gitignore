@@ -1,1 +1,5 @@
 site/public/
+deploy/public/
+deploy/.terraform/
+deploy/terraform.tfstate
+deploy/terraform.tfstate.backup

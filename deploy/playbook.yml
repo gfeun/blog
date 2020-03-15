@@ -10,12 +10,12 @@
     - name: copy certificate from environment variable
       copy:
         content: "{{ lookup('env','CERTIFICATE') }}"
-        dest: /etc/nginx/ssl/blog.hackervaillant.eu.crt
+        dest: "/etc/nginx/ssl/{{ blog_fqdn }}.crt"
 
     - name: copy private key from environment variable
       copy:
         content: "{{ lookup('env','PRIVATE_KEY') }}"
-        dest: /etc/nginx/ssl/blog.hackervaillant.eu.key
+        dest: "/etc/nginx/ssl/{{ blog_fqdn }}.key"
 
     - name: include nginx role
       include_role:
@@ -24,4 +24,4 @@
     - name: copy blog
       copy:
         src: public
-        dest: /var/www/blog.hackervaillant.eu/
+        dest: "/var/www/{{ blog_fqdn }}/"
