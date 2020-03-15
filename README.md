@@ -1,11 +1,11 @@
 # Blog Repo
+Source for my blog available at: https://blog.hackervaillant.eu/
 
 [/site]() contains my Hugo blog
 
 [/deploy]() contains terraform for infrastructure setup and ansible playbook for server installation
 
 # Usage
-
 `make install_blog` is used for first install and blog updates
 
 - It first builds the blog using [Hugo](https://gohugo.io/) static site generator
