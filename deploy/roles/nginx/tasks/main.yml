@@ -1,0 +1,20 @@
+---
+- name: install nginx
+  package:
+    name: nginx
+    state: present
+
+- name: copy nginx config
+  copy:
+    src: nginx/
+    dest: /etc/nginx
+
+- name: generate DH parameters
+  openssl_dhparam:
+    path: /etc/nginx/dhparam.pem
+    size: 2048
+
+- name: reload nginx
+  systemd:
+    name: nginx
+    state: reloaded
