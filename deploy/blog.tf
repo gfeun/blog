@@ -11,7 +11,7 @@ resource "digitalocean_droplet" "blog" {
   image = "debian-10-x64"
   name = "blog"
   region = "lon1"
-  size = "1GB"
+  size = "s-1vcpu-1gb"
   private_networking = true
   ssh_keys = [data.digitalocean_ssh_key.default.fingerprint]
 }
