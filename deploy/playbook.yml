@@ -1,21 +1,50 @@
 ---
 - hosts: all
   tasks:
-    - name: create certificate directory
-      file:
-        path: /etc/nginx/ssl/
-        state: directory
-        mode: '0700'
+    - name: install certbot
+      package:
+        name:
+          - certbot
+          - python3-certbot-dns-ovh
+        state: present
 
-    - name: copy certificate from environment variable
+    - name: copy ovh api credentials
       copy:
-        content: "{{ lookup('env','CERTIFICATE') }}"
-        dest: "/etc/nginx/ssl/{{ blog_fqdn }}.crt"
+        src: certbot_ovh.ini
+        dest: /etc/letsencrypt/certbot_ovh.ini
+        owner: root
+        mode: 0600
 
-    - name: copy private key from environment variable
+    - name: copy ovh dyndns systemd timer and service
       copy:
-        content: "{{ lookup('env','PRIVATE_KEY') }}"
-        dest: "/etc/nginx/ssl/{{ blog_fqdn }}.key"
+        src: "{{item}}"
+        dest: /etc/systemd/system/
+      loop:
+        - dyndns_ovh.service
+        - dyndns_ovh.timer
+
+    - name: copy dyndns ovh script
+      copy:
+        src: dyndns_ovh.py
+        dest: /usr/local/bin/dyndns_ovh
+        mode: 0700
+
+    - name: install dyndns dependencies
+      pip:
+        name: ovh
+        executable: pip3
+        extra_args: --system
+        state: present
+
+    - name: start dyndns timer
+      systemd:
+        name: dyndns_ovh.timer
+        state: started
+        daemon_reload: yes
+        enabled: yes
+
+    - name: run certbot
+      command: certbot certonly --dns-ovh --dns-ovh-credentials /etc/letsencrypt/certbot_ovh.ini -m "{{ mail_address }}" -d "{{ blog_fqdn }}" --agree-tos --non-interactive
 
     - name: include nginx role
       include_role:
@@ -25,3 +54,8 @@
       copy:
         src: public
         dest: "/var/www/{{ blog_fqdn }}/"
+
+    - name: remove default nginx site
+      file:
+        path: /etc/nginx/site-enabled/default
+        state: absent

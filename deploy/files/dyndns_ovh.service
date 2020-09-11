@@ -1,0 +1,5 @@
+[Unit]
+Description=Update DNS record IP according to current public IP
+
+[Service]
+ExecStart=/usr/local/bin/dyndns_ovh

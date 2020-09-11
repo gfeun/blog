@@ -64,7 +64,7 @@ resource "acme_certificate" "blog_certificate" {
   common_name               = "blog.hackervaillant.eu"
 
   dns_challenge {
-    provider = "digitalocean"
+    provider = "ovh"
     config = {
       DO_AUTH_TOKEN = var.do_token
     }
