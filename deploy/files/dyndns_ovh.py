@@ -17,7 +17,7 @@ with open("/etc/letsencrypt/certbot_ovh.ini") as stream:
     parser.read_string("[hack]\n" + stream.read())
 
 ZONE = "hackervaillant.eu"
-SUBDOMAIN = "blog"
+SUBDOMAINS = ["blog", "zenikanard"]
 
 # OVH API credentials used by Certbot
 
@@ -37,34 +37,37 @@ ip_response.raise_for_status()
 ip = ip_response.text
 logging.info(f"public ip is {ip}")
 
-logging.info(f"get {SUBDOMAIN}.{ZONE} recordID from ovh API")
-recordList = client.get(
-    f"/domain/zone/{ZONE}/record", fieldType="A", subDomain=f"{SUBDOMAIN}",
-)
-
-if len(recordList) == 0:
-    logging.info(f"didn't find a record for {SUBDOMAIN}.{ZONE} - create record")
-    result = client.post(
+for SUBDOMAIN in SUBDOMAINS:
+    logging.info(f"get {SUBDOMAIN}.{ZONE} recordID from ovh API")
+    recordList = client.get(
         f"/domain/zone/{ZONE}/record",
         fieldType="A",
-        subDomain=SUBDOMAIN,
-        target=ip,
-        ttl=60,
+        subDomain=f"{SUBDOMAIN}",
     )
-    logging.info(f'{SUBDOMAIN}.{ZONE} set to {result["target"]}')
-    result = client.post(f"/domain/zone/{ZONE}/refresh")
-    exit(0)
 
-recordID = recordList[0]
+    if len(recordList) == 0:
+        logging.info(f"didn't find a record for {SUBDOMAIN}.{ZONE} - create record")
+        result = client.post(
+            f"/domain/zone/{ZONE}/record",
+            fieldType="A",
+            subDomain=SUBDOMAIN,
+            target=ip,
+            ttl=60,
+        )
+        logging.info(f'{SUBDOMAIN}.{ZONE} set to {result["target"]}')
+        result = client.post(f"/domain/zone/{ZONE}/refresh")
+        exit(0)
 
-logging.info(f"get {SUBDOMAIN}.{ZONE} record from ovh API")
-record = client.get(f"/domain/zone/{ZONE}/record/{recordID}")
+    recordID = recordList[0]
 
-if record["target"] != ip:
-    logging.info(
-        f'dns ip ({record["target"]}) differ from current public ip ({ip}) - update record'
-    )
-    createdRecord = client.put(f"/domain/zone/{ZONE}/record/{recordID}", target=ip)
-    result = client.post(f"/domain/zone/{ZONE}/refresh")
-else:
-    logging.info(f"{ip} is already set for {SUBDOMAIN}.{ZONE}")
+    logging.info(f"get {SUBDOMAIN}.{ZONE} record from ovh API")
+    record = client.get(f"/domain/zone/{ZONE}/record/{recordID}")
+
+    if record["target"] != ip:
+        logging.info(
+            f'dns ip ({record["target"]}) differ from current public ip ({ip}) - update record'
+        )
+        createdRecord = client.put(f"/domain/zone/{ZONE}/record/{recordID}", target=ip)
+        result = client.post(f"/domain/zone/{ZONE}/refresh")
+    else:
+        logging.info(f"{ip} is already set for {SUBDOMAIN}.{ZONE}")
