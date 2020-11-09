@@ -20,8 +20,9 @@ enableGitInfo = true
 [params]
     author = "Glenn Feunteun"
     description = "Personal Website"
-    keywords = "blog,developer,personal"
-    info = "Research Engineer on Content Delivery Networks"
+    keywords = "blog,developer,personal,devops"
+    info = "DevOps consultant at Zenika"
+      #Previously Research Engineer on Content Delivery Networks"
     avatarurl = "images/gfeun.jpeg"
     #footercontent = "Enter a text here."
 
@@ -29,6 +30,7 @@ enableGitInfo = true
 
     hideCredits = false
     hideCopyright = false
+    hideColorSchemeToggle = false
 
     # Git Commit in Footer, uncomment the line below to enable it.
     commit = "https://github.com/gfeun/blog/commit/"
@@ -36,7 +38,7 @@ enableGitInfo = true
     rtl = false
 
     # Use inverted colors
-    colorscheme = "light"
+    colorscheme = "auto"
 
     # Series see also post count
     maxSeeAlsoItems = 5
@@ -49,14 +51,19 @@ enableGitInfo = true
 
     [[params.social]]
         name = "Github"
-        icon = "fab fa-github"
+        icon = "fa fa-github"
         weight = 1
         url = "https://github.com/gfeun/"
     [[params.social]]
         name = "LinkedIn"
-        icon = "fab fa-linkedin"
+        icon = "fa fa-linkedin"
         weight = 2
         url = "https://www.linkedin.com/in/glenn-feunteun/"
+    [[params.social]]
+        name = "Twitter"
+        icon = "fa fa-twitter"
+        weight = 3
+        url = "https://twitter.com/g_feun"
 
 [taxonomies]
   category = "categories"
