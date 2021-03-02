@@ -56,7 +56,7 @@ for SUBDOMAIN in SUBDOMAINS:
         )
         logging.info(f'{SUBDOMAIN}.{ZONE} set to {result["target"]}')
         result = client.post(f"/domain/zone/{ZONE}/refresh")
-        exit(0)
+        continue
 
     recordID = recordList[0]
 

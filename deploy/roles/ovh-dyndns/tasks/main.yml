@@ -1,0 +1,39 @@
+---
+
+- name: stat certbot_ovh.ini credentials file
+  ansible.builtin.stat:
+    path: /etc/letsencrypt/certbot_ovh.ini
+  register: st
+
+- name: fail if the certbot_ovh does not exist
+  ansible.builtin.fail:
+    msg: "/etc/letsencrypt/certbot_ovh.ini"
+  when: not st.stat.exists
+
+- name: copy ovh dyndns systemd timer and service
+  ansible.builtin.copy:
+    src: "{{item}}"
+    dest: /etc/systemd/system/
+  loop:
+    - dyndns_ovh.service
+    - dyndns_ovh.timer
+
+- name: copy dyndns ovh script
+  ansible.builtin.copy:
+    src: dyndns_ovh.py
+    dest: /usr/local/bin/dyndns_ovh
+    mode: 0700
+
+- name: install dyndns ovh dependencies
+  ansible.builtin.pip:
+    name: ovh
+    executable: pip3
+    extra_args: --system
+    state: present
+
+- name: start dyndns ovh timer
+  ansible.builtin.systemd:
+    name: dyndns_ovh.timer
+    state: started
+    daemon_reload: yes
+    enabled: yes

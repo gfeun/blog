@@ -1,16 +1,16 @@
 ---
 - name: install nginx
-  package:
+  ansible.builtin.package:
     name: nginx
     state: present
 
 - name: copy nginx config
-  copy:
+  ansible.builtin.copy:
     src: nginx/
     dest: /etc/nginx
 
 - name: generate DH parameters
-  openssl_dhparam:
+  community.crypto.openssl_dhparam:
     path: /etc/nginx/dhparam.pem
     size: 2048
 
@@ -18,3 +18,8 @@
   systemd:
     name: nginx
     state: reloaded
+
+- name: remove default nginx site
+  file:
+    path: /etc/nginx/site-enabled/default
+    state: absent

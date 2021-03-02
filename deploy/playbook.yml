@@ -1,61 +1,44 @@
 ---
 - hosts: all
+  tags:
+    - install
   tasks:
-    - name: install certbot
-      package:
-        name:
-          - certbot
-          - python3-certbot-dns-ovh
-        state: present
-
     - name: copy ovh api credentials
-      copy:
+      ansible.builtin.copy:
         src: certbot_ovh.ini
         dest: /etc/letsencrypt/certbot_ovh.ini
         owner: root
         mode: 0600
 
-    - name: copy ovh dyndns systemd timer and service
-      copy:
-        src: "{{item}}"
-        dest: /etc/systemd/system/
-      loop:
-        - dyndns_ovh.service
-        - dyndns_ovh.timer
+    - name: include ovh-dyndns role
+      ansible.builtin.include_role:
+        name: ovh-dyndns
 
-    - name: copy dyndns ovh script
-      copy:
-        src: dyndns_ovh.py
-        dest: /usr/local/bin/dyndns_ovh
-        mode: 0700
-
-    - name: install dyndns dependencies
-      pip:
-        name: ovh
-        executable: pip3
-        extra_args: --system
+    - name: install certbot
+      ansible.builtin.package:
+        name:
+          - certbot
+          - python3-certbot-dns-ovh
         state: present
 
-    - name: start dyndns timer
-      systemd:
-        name: dyndns_ovh.timer
-        state: started
-        daemon_reload: yes
-        enabled: yes
-
     - name: run certbot
-      command: certbot certonly --dns-ovh --dns-ovh-credentials /etc/letsencrypt/certbot_ovh.ini -m "{{ mail_address }}" -d "{{ blog_fqdn }}" --agree-tos --non-interactive
+      ansible.builtin.command: certbot certonly --dns-ovh --dns-ovh-credentials /etc/letsencrypt/certbot_ovh.ini -m "{{ mail_address }}" -d "{{ blog_fqdn }}" --agree-tos --non-interactive
 
     - name: include nginx role
-      include_role:
+      ansible.builtin.include_role:
         name: nginx
 
+    - name: install rsync
+      ansible.builtin.package:
+        name: rsync
+        state: present
+
+- hosts: all
+  gather_facts: no
+  tasks:
     - name: copy blog
-      copy:
+      ansible.posix.synchronize:
         src: public
         dest: "/var/www/{{ blog_fqdn }}/"
-
-    - name: remove default nginx site
-      file:
-        path: /etc/nginx/site-enabled/default
-        state: absent
+      tags:
+        - blog
