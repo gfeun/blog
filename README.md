@@ -1,17 +1,13 @@
 # Blog Repo
+
 Source for my blog available at: https://blog.hackervaillant.eu/
 
-[/site]() contains my Hugo blog
+[/site](./site) contains my Hugo blog
 
-[/deploy]() contains terraform for infrastructure setup and ansible playbook for server installation
+[/deploy](./deploy) ansible playbook for server installation
 
-# Usage
-`make install_blog` is used for first install and blog updates
+## Usage
 
-- It first builds the blog using [Hugo](https://gohugo.io/) static site generator
-- Then it creates or updates the infrastructure using Terraform
-- Finally it provisions the blog on the server
+`make deploy_blog_full` is used for a full install with webserver config, certbot and dyndns setup
 
-`make destroy_blog` deletes the infrastructure
-
-`make reinstall_blog` is a helper to run destroy_blog and install_blog successively
+`make deploy_blog_content_only` is used to only upload the blog content
